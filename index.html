@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRUD Operations</title>
+    <link type="text/css" rel="stylesheet" href="style.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <!--Bootstarp-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <!--Importing JQuery-->
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Product Management</h1>
+
+      <!-- Form for Adding/Editing Products -->
+      <form id="product-form">
+        <div>
+          <label for="productCode">Product Code</label>
+          <input type="text" name="productCode" id="productCode" />
+          <small class="error productcode"> </small>
+        </div>
+        <div>
+          <label for="productName">Product Name</label>
+          <input type="text" name="productName" id="productName" />
+          <small class="error productName"> </small>
+        </div>
+        <div>
+          <label for="quantity">Quantity</label>
+          <input type="number" name="quantity" id="quantity" />
+          <small class="error quantity"> </small>
+        </div>
+        <div>
+          <label for="price">Price</label>
+          <input type="number" name="price" id="price" />
+          <small class="error price"> </small>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-success" type="submit">Save</button>
+          <button class="btn btn-warning" type="button" id="clear-form">Clear</button>
+        </div>
+      </form>
+
+      <!-- Product List -->
+      <table class="list" id="product-list">
+        <thead>
+          <tr>
+            <th>Product Code</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="data">
+          <!-- Product list items will be dynamically added here -->
+        </tbody>
+      </table>
+      <center><p id="status"></p></center>
+    </div>
+
+    <script type="text/javascript" src="./script.js"></script>
+    <script>
+
+      let records = {}; // Initialize an empty array to store product data
+
+      //Function to display the saved records
+      function displayRecords(records) {
+
+        //Check whether the record is empty 
+        if (Object.keys(records).length < 1) {
+          $("#status").text("No Records"); //display No Records if the record is empty
+          $("#data").html(""); //clear the records 
+
+        } else {
+          $("#status").text("");
+          let data = ``;
+          for (const key in records) {
+            data +=
+              `<tr id='`+key+`''><td>` +
+              records[key]["productCode"] +
+              `</td>
+            <td>` +
+              records[key]["productName"] +
+              `</td>
+            <td>` +
+              records[key]["quantity"] +
+              `</td>
+            <td>` +
+              records[key]["price"] +
+              `</td>
+            <td><button class='btn btn-primary edit' type='button' id ='` +
+              key +
+              `' >Edit</button>&emsp;<button class='btn btn-danger delete' type='button' id ='` +
+              key +
+              `' >Delete</button></td>
+            </tr>`;
+          }
+          data += "</tr>";
+          $("#data").html(data); //Insert the records to HTML
+          $("input").val(""); // Remove the No Records Error Message
+        }
+
+        //Delete the existing record
+        $(".delete").click(function () {
+          let id = $(this).attr("id");
+          delete records[id];
+          displayRecords(records);
+        });
+      }
+
+      //function for Product Code Validations
+      function productcodeValidations() {
+        let value = $("#productCode").val();
+        if (value == "") {
+          $(".productcode").text("Please enter the product code.");
+        } else if (value.length > 10) {
+          $(".productcode").text(
+            "Product code should be less than 10 characters."
+          );
+        } else {
+          $(".productcode").text("");
+          return true;
+        }
+      }
+
+      //function for Product Name Validations
+      function productNameValidations() {
+        let value = $("#productName").val();
+        if (value == "") {
+          $(".productName").text("Please enter the product name.");
+        } else {
+          $(".productName").text("");
+          return true;
+        }
+      }
+
+      //function for Quantity Validations
+      function quantityValidations() {
+        let value = $("#quantity").val();
+        if (value == "") {
+          $(".quantity").text("Please enter the quantity.");
+        } else {
+          $(".quantity").text("");
+          return true;
+        }
+      }
+      //function for Price Validations
+      function priceValidations() {
+        let value = $("#price").val();
+        if (value == "") {
+          $(".price").text("Please enter the price.");
+        } else {
+          $(".price").text("");
+          return true;
+        }
+      }
+
+      $(window).on("load", function () {
+
+        $("#productCode").on("input", function () {
+          productcodeValidations();
+        });
+        $("#productName").on("input", function () {
+          productNameValidations();
+        });
+        $("#quantity").on("input", function () {
+          quantityValidations();
+        });
+        $("#price").on("input", function () {
+          priceValidations();
+        });
+
+        $("#product-form").on("submit", function (event) {
+          event.preventDefault();
+          if (
+            productcodeValidations() &&
+            productNameValidations() &&
+            quantityValidations() &&
+            priceValidations()
+          ) {
+            let v = Object.keys(records).length;
+            records[v] = {
+              productCode: $("#productCode").val(),
+              productName: $("#productName").val(),
+              quantity: $("#quantity").val(),
+              price: $("#price").val(),
+            };
+            displayRecords(records);
+          }
+        });
+        $("#clear-form").click(function () {
+          $("input").val("");
+          $("small").text("");
+        });
+        displayRecords(records);
+      });
+
+    </script>
+  </body>
+</html>
